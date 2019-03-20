@@ -18,12 +18,12 @@ M586 P1 S1                                  ; Enable FTP
 M586 P2 S1                                  ; Enable Telnet
 
 ; Drives
-M569 P0 S0 D3 V100                          ; Drive 0 goes forwards
-M569 P1 S0 D3 V100                          ; Drive 1 goes forwards
-M569 P2 S0 D3 V100                          ; Drive 2 goes forwards
-M569 P3 S0 D2                               ; Drive 3 goes forwards
+M569 P0 S0 D3 V100                          ; Drive 0 goes forwards, stealthChop mode, switch from stealthChop to to spreadCycle mode only at high speeds
+M569 P1 S0 D3 V100                          ; same as Drive 0 
+M569 P2 S0 D3 V100                          ; same as Drive 0 
+M569 P3 S0 D2                               ; Drive 3 (Extruder) goes forwards, spreadCycle mode
 M350 X16 Y16 Z16 E16 I1                     ; Configure microstepping with interpolation
-M92 X80.00 Y80.00 Z80.00 E415.00            ; Set steps per mm
+M92 X80.00 Y80.00 Z80.00 E415.00            ; Set steps per mm (with Bondtech BMG Extruder)
 M566 X1200.00 Y1200.00 Z1200.00 E1200.00    ; Set maximum instantaneous speed changes (mm/min)
 M203 X18000.00 Y18000.00 Z18000.00 E1200.00 ; Set maximum speeds (mm/min)
 M201 X1000.00 Y1000.00 Z1000.00 E1000.00    ; Set accelerations (mm/s^2)
@@ -38,14 +38,14 @@ M574 X2 Y2 Z2 S1                            ; Set active high endstops
 
 ; Z-Probe
 M558 P6 H5 F120 T6000                       ; Set Z probe type to switch and the dive height + speeds
-G31 P500 X0 Y0 Z15.698                      ; Set Z probe trigger value, offset and trigger height
+G31 P500 X0 Y0 Z15.698                      ; Set Z probe trigger value, offset and trigger height - must be adjusted for your machine
 M557 R185 S20                               ; Define mesh grid
 
 ; Heaters
-M305 P0 T100000 B3950 R2200                 ; Set thermistor + ADC parameters for heater 0
-M305 P1 T100000 B3950 R2200                 ; Set thermistor + ADC parameters for heater 1
-M307 H0 A137.8 C533.3 D1.5 V24.3 B0                            
-M307 H1 A503.5 C107.0 D9.3 V24.3 B0 
+M305 P0 T100000 B3950 R2200                 ; Set thermistor + ADC parameters for heater 0 (thermistor type guessed)
+M305 P1 T100000 B3950 R2200                 ; Set thermistor + ADC parameters for heater 1 (thermistor type guessed)
+M307 H0 A137.8 C533.3 D1.5 V24.3 B0         ; PID parameters for heatbed - must be adjusted for your machine                   
+M307 H1 A503.5 C107.0 D9.3 V24.3 B0         ; PID parameters for hotend - must be adjusted for your machine                   
 M143 H0 S120                                ; Set temperature limit for heater 0 to 120C
 M143 H1 S280                                ; Set temperature limit for heater 1 to 280C
 
