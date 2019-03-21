@@ -71,7 +71,7 @@ G10 P0 R0 S0                                ; Set initial tool 0 active and stan
 T0 											; select tool 0
 
 ; Filament Sensor
-M591 D0 P1 C3 S1
+M591 D0 P0 C3 S1
 
 ; Automatic saving after power loss is not enabled
 
