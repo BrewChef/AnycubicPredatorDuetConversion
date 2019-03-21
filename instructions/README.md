@@ -1,5 +1,4 @@
-watch https://www.youtube.com/watch?v=BgkJVgFnPaE for first idea
-have this opened or printed for reference https://duet3d.dozuki.com/Wiki/Duet_2_Maestro_Wiring_Diagram
+watch https://www.youtube.com/watch?v=BgkJVgFnPaE for first idea and have this opened or printed for reference https://duet3d.dozuki.com/Wiki/Duet_2_Maestro_Wiring_Diagram
 
 - connect hotend, bed and their thermistors to the respective ports at the Duet (Bed and E0)
 - maybe you've got to extend the hotend cable (I had)
