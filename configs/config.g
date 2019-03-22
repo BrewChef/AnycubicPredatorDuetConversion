@@ -23,7 +23,7 @@ M586 P2 S1                                  ; Enable Telnet (enable or disable f
 M569 P0 S0 D3 V100                          ; Drive 0 (X) goes forwards, stealthChop mode, switch from stealthChop to to spreadCycle mode only at high speeds
 M569 P1 S0 D3 V100                          ; Drive 1 (Y) same as Drive 0 
 M569 P2 S0 D3 V100                          ; Drive 2 (Z) same as Drive 0 
-M569 P3 S0 D2                               ; Drive 3 (Extruder) goes forwards, spreadCycle mode
+M569 P3 S1 D2                               ; Drive 3 (Extruder) goes backwards, spreadCycle mode
 M350 X16 Y16 Z16 E16 I1                     ; Configure microstepping with interpolation
 M92 X80.00 Y80.00 Z80.00 E390.63            ; Set steps per mm 
 
