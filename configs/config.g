@@ -64,7 +64,7 @@ M106 P1 S1 I0 F100 H1 T45 C"Heatsink"       ; Set fan 1 value, PWM signal invers
 M106 P2 S1 I0 F100 H100:101 T40 C"Board"	; Set fan 2 value, PWM signal inversion and frequency. Thermostatic control is turned on
 
 ; Tools
-M200 D1.75									; set extruder filament diameter to 1.75mm
+M200 D0					    ; turn volumetric control off
 M563 P0 D0 H1 F0                            ; Define tool 0, extruder 0, Heater 1, Fan 0
 G10 P0 X0 Y0 Z0                             ; Set tool 0 axis offsets
 G10 P0 R0 S0                                ; Set initial tool 0 active and standby temperatures to 0C
