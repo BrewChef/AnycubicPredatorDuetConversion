@@ -1,0 +1,344 @@
+;[[After the semicolon is a comment, please modify the corresponding parameters according to the comment, the command after the semicolon will be ignored]]
+The basic format is Mxxx Ixxx, Mxxx Txxx or Mxxx Sxxx, where Ixx (which is the letter I, the first letter of the integer, not the number 1) followed by an integer, which can be either decimal or hexadecimal (starting with 0x) ), followed by Sxx is a floating point number
+;
+[Print off and power off save] need to use the module together, if there is no related module, please set it to 0;
+M8000 I1 ; Power-off save support or not, I1 means support, I0 means no support, restart will take effect after setting
+M8001 I0; print shutdown support or not, I1 means support, I0 means no support, restart will take effect after setting
+;
+[Stepper motor direction control] The direction of I1 and I-1 is just opposite, so if the motor direction is wrong, either change the wiring or change the direction parameter.
+M8002 I1; ;X stepper motor direction, I1 or I-1
+M8003 I1 ; Y stepper motor direction
+M8004 I1 ; Z stepper motor direction
+M8005 I-1 ; E stepper motor direction
+M8005 I1 E2 ; Set the second E stepper motor direction, I1 or I-1. If there are no multiple nozzles, please ignore this configuration.
+M8005 I1 E3 ; Set the third E stepping motor direction, I1 or I-1. If there is no multi-nozzle, please ignore this configuration. The three nozzles only support three in and one out.
+
+;[XYZ axis extrusion head/platform movement configuration] only affects the actual movement direction of the manual interface button;;;;;;;;;;;;;;;;;;;;;;;;;;
+M8005 X0 ; 0: X-axis direction Extrusion head movement
+; 1: X-axis direction Platform movement Currently, most of the machines on the market are X-axis extrusion head movements.
+M8005 Y0 ; 0: Y-axis direction Extrusion head movement
+; 1: Y-axis direction Platform motion Currently, the Y-axis of the structure of I3 is platform motion.
+The delta, ultimaker and makerbot's Y-axis is the extrusion head movement
+M8005 Z0 ; 0: Z-axis direction Extrusion head movement, current I3 structure and delta structure Z-axis is the extrusion head movement,
+; 1: Z-axis direction platform motion, ultimaker and makerbot structure Z-axis is platform movement
+;
+
+
+
+;[XYZE default speed/acceleration setting] speed in mm/s, acceleration in mm/s^2
+M8006 I50; the maximum starting speed, when the speed of movement has passed this speed, it will start at this speed.
+This speed is mainly to prevent out of step, this value is too small, will cause the rail angle bulge when rounding
+M8007 I25; the maximum rail bending speed value (corresponding to the jerk speed in the open source firmware), if the actual rail bending speed of the motion is greater than this value,
+; will force the movement to slow down. When filling, there will be a lot of reciprocating motions, this value is large, the noise is large, and it is easy to lose steps.
+; This value is small, slow, and print quality is relatively poor when printing speed is high
+M8008 I1100 ; Acceleration, the larger the value, the larger the average speed of actual operation, but the noise is also large, the value is small, and the actual speed will be smaller.
+;
+
+; [E-axis independent speed / acceleration setting] speed in mm / s, acceleration in mm / s ^ 2
+Note: If the E-axis is a step-down motor, the speed and acceleration of E should be reduced because of the deceleration, otherwise the E-axis will be out of step.
+M8007 E25; maximum rail bending speed value (corresponding to jerk speed in open source firmware), if the actual rail bending speed of the motion is greater than this value
+M8008 E1100 ; acceleration, the larger the value, the greater the average speed of actual operation, the bending speed and acceleration of the E-axis will affect the brushed bridge
+;
+
+
+;[[[step related parameters]]] After the parameters are set, please print a cube, then measure the size with a ruler to confirm that there is no problem with the parameters.
+If the machine is a delta structure, set the motor parameters of XYZ to be the same, and the Z parameters are the same as the XY calculation method.
+M8009 S0.0125; [XY value of each step of XY] is 20 teeth, the pitch is 2mm (mxl specification, 2gt is 2mm), 1.8 degree stepper motor,
+; 16 subdivision, then (20 * 2) / ((360 / 1.8) * 16)
+;M8009 X0.0125 Y0.0125 ; If you need to set the X, Y stepper motor parameters independently, you can use this command
+;
+M8010 S0.0125 ; [Z value of each step of Z] On a non-delta machine, calculate the formula: lead / ((360 / 1.8) * 16).
+If it is on a delta machine, set it to the same as the XY parameter.
+
+;
+; [E mm value of each step] Calculation formula: roller circumference / ((360 / 1.8) * 16), circumference is diameter * Pi
+M8011 S0.00256; If you find that the set wire is thin, or often faulty, it is recommended to set this value to be smaller than the actual value.
+Better out of the wire
+;
+;
+;[Various speeds maximum] In order to ensure the machine can be stable, please set according to the measured results.
+M8012 I150; maximum speed of XY motion mm/s
+M8013 I150; maximum speed of Z motion mm/s
+M8014 I80; maximum speed of the extruder mm/s
+;
+; [return to zero speed] makerware slice software slice, will ignore this zero return speed, because there is a specified zero speed in its gcode
+M8015 I30 ; The first zero return speed when Z is zero, the speed is faster, and the Z movement speed of the manual interface is also the same as this speed.
+M8015 S30; the first zero return speed when XY is zero, the speed is faster, the XY moving speed of the manual interface
+M8016 I10 ; The second zero return speed when Z is zero, the speed is slower, and the second zero return speed can improve the repeat positioning accuracy of the limit.
+M8016 S10; the second zero return speed when XY is zero, the speed is slower, lowering the second zero return speed can improve the repeat positioning accuracy of the limit
+;
+;[Pre-extrusion before printing]
+M8017 I1; pre-extrusion length mm, whether the first layer and the bottom plate are stuck directly affects the print quality, and a little more pre-extrusion will make the bottom plate stick better.
+M8018 I60; the maximum pre-extrusion speed of the extruder is mm/s, non-reduction gear feeding, the maximum speed is usually above 100,
+;
+; [Compatible with Replicator/Makerware software closely related parameters] If you do not plan to be compatible with this type of software, you can leave it alone
+M8019 I0 ; Supported maximum retraction speed in mm/s. When it is 0, it means the same as E maximum speed.
+The default Makerware double-headed slice is very slow, and the withdrawal time is very long.
+M8020 S0; the length of the retraction, mm, the distance of the retraction, the back of the cable will be leaked, the pumping is too large, the pause time is too long, and it is easy to leak.
+Please set according to your feed type and extrusion head type. If it is 0, the wire length follows the slicing software.
+M8033 S0 ; makerware software to switch the length of the wire when the extrusion head, the makerware slice specified the wire is very long,
+; easy to jam when re-squeezing, if zero, follow the slicing software settings
+;
+;[Default consumable diameter] unit is mm
+M8021 S1.75; consumable diameter
+;
+;[Extruder head maximum temperature]
+M8022 I250; the maximum temperature supported by the extrusion head. This temperature is set to prevent the user from erroneously operating the extrusion head temperature and causing damage to the extrusion head.
+The thermal resistance can only reach 260 degrees, and the peek tube also starts to soften at about 260 degrees.
+;
+;
+; [Consumer interface, the lowest temperature of the wire]
+M8022 T180 ; consumable interface, the minimum temperature required to extrude consumables
+;
+;[The highest temperature of the hot bed]
+M8023 I120; the maximum temperature of the hot plate, the temperature is too high, it is easy to damage the hot plate
+;
+[Temperature error detection] The default temperature error detection will pop up a warning when the temperature sensor is not plugged in or the heating power is too low.
+; strongly recommended not to disable this feature
+M8023 T0 ; 0: Enable temperature detection
+; 1: Prohibit extrusion head and hot bed temperature error detection
+; 2: Only the temperature error detection of the hot bed is prohibited
+;
+; [X, Y, Z maximum stroke] Please set according to the actual print size, the unit is mm
+; Please be sure to set this parameter carefully! ! ! ! ! ! If the setting is too small, when printing, the place where the set stroke is exceeded
+; can not print, if the setting is too large, then if the slice move command exceeds the actual machine travel, it will not
+; Exceeding the limit of the position will cause the motor to force the collision
+; If the machine is a delta structure, the following travel parameters are ignored
+M8024 I200 ; X maximum stroke, in the case of lcd enabled sound, the movement beyond the stroke during printing will cause the buzzer to sound.
+; There is no travel limit when operating the manual interface
+M8025 I200 ; Y maximum stroke
+M8026 I500 ; Z maximum stroke
+;
+;[Set the number of extrusion heads] at least one, currently up to three, only three shots in the case of 3 nozzles
+M8027 I1 ; configure the number of extrusion heads
+;
+; [Whether it is more than one nozzle], the multiple nozzles share a temperature sensor and share a heating rod
+M8027 S0 ; 0: Not more than one in and out 1: More in and out
+
+;[Special features of multiple Y or multiple Z];
+The second extrusion head is used as Z. Some large machines require two Z axes, so E2 can be used as the Z axis. This command forces the number of extrusion heads to be 1.
+;M8027 Z0 ; If this function is enabled, please remove the previous ';', disable the function, and comment out it with ';'.
+; 0: Double Z double limit mode, the second limit is connected to Z+,
+; 1: double Z single limit mode, only need to connect a limit switch
+3: Three Z mode, two other Z extension ports
+;
+The second extrusion head is used as Y
+;M8027 Y0 ; If this function is enabled, please remove the previous ';', disable the function, and comment it out with ';'
+;
+The second extrusion head is used as the first extrusion
+M8027 E0 ; If this function is enabled, please remove the previous ';', disable the function, and comment it out with ';'
+;
+;[Thermal bed is enabled] Some machines will want to prohibit the hot bed, and the hot bed can be prohibited by this instruction.
+M8027 T1 ; 1: Enable hot bed
+; 0: No hot bed
+;
+;[Advanced settings, retraction compensation]
+M8028 S0.00; Retreat compensation, machine, and then extruding after retreating, because of the elastic effect, it will actually retreat a little bit than the original position.
+If you don't understand it, it will be zero directly
+;
+;[XY axis limit switch position type]
+0: reprap model, usually using repetier-host and cura, the limit switch position is at the zero point of x, y,
+The limit is installed at X-, Y-. At the limit, the extrusion head is on the left front of the platform
+1: makerbot is similar to the model, usually using replicatorG/makerware/makerbot desktop slicing software.
+The limit position is at the maximum of x, y, the limit is connected to X+, Y+, and when the limit is reached, the extrusion head is at the right rear of the platform.
+2: ultimaker models, both with limit switches, a total of six limit
+3: When the limit is reached, the extrusion head is at the left rear of the platform (very few, the limit is connected to X-, Y+)
+4: When the limit is reached, the extrusion head is on the right front of the platform (very few, the limit is connected to X+, Y-)
+For delta type machines, this parameter will be ignored, and the limit switches are all connected to X+, Y+, Z+,
+M8029 I0 ; 0: One-sided zero limit (left front), such as mendel, i3...
+; 1: single side maximum point limit (right rear), such as makerbot model
+2: Bilateral limit, such as ultimaker model, mini board only XYZ three limit, do not configure to use this option
+3: Left rear limit (very few) 4: Right front limit (very few)
+;
+;
+;
+;[XYZ limit switch wiring type] If this configuration is wrong, the motor will not move and the buzzer will be in a certain direction when the motor is operated by the manual interface.
+; The sound of the drop will be emitted, and the short-circuit cap next to the Filament case is used to select the voltage value of the limit (3.3/5V), and must not be left floating.
+Simple judgment method, if the configuration is normal, when the limit is changed to the limit, the buzzer will make a drip sound.
+When the limit is changed to the unrestricted position, the buzzer will not sound. If the opposite phenomenon is found, modify this configuration.
+M8029 T1 ; 0: Limit switch normally open (when unrestricted - and s voltage is high level, low level when limit)
+; 1: Limit switch normally closed (when unrestricted - and s voltage is low level, high level when limit)
+;
+;【Z-axis limit switch position】
+M8029 S0 ; 0: The limit of the extrusion head closest to the platform, the limit is connected to Z-
+; 1: the limit of the extrusion head is farthest from the platform, the limit is connected to Z+
+;
+;[Whether the XYZ axis returns to (0,0,0) after homing, only XYZ or hbot models]
+M8029 C0 ; 0 : return to the XYZ (0,0,0) position, that is, the position of the extrusion head back to the left front of the platform
+; ;1 : Stay in the limit position
+;
+;
+; [breaking detection enable] The limit of the material cut is the limit of FILAMENT. If this function is enabled, the leveling limit of the delta structure must be connected to Z-.
+If the function is not enabled, the leveling limit of the delta structure is connected to FILAMENT
+M8029 D1 ; 0: Prohibit material break detection
+                 ; 1: enable break detection
+M8029 R1 ; (Z+)1: ​​Leveling limit switch is the same as XYZ; -1 is the opposite
+;
+; [FILAMENT (breaking detection / leveling limit) limit beginning configuration];
+In the Delta model, the leveling switch is only enabled after clicking the leveling and the motor is zeroed.
+If the switch is set incorrectly, it will cause the motor to always move on the top when it is automatically leveled, and will not go down to the bottom plate.
+Normally, the limit is always disabled, even if the switch is triggered, it will not cause the buzzer to drip.
+M8029 P1 ; 1: Same as XYZ limit type
+; -1: the opposite of the XYZ limit type
+;
+[Extrusion fan control] If the extrusion head is a makerbot structure, the extruder needs to dissipate heat as soon as it is heated, otherwise the extrusion opportunity will overheat.
+If the extrusion head is ultimaker's structure, whether the fan needs to be turned on is specified by the slicing software
+M8030 I0 ;>0: If you need to force the extruder to open the fan automatically when it is greater than a certain temperature, set a temperature greater than 0.
+; 0: If set to 0, the fan is controlled by the slice software.
+;
+;[Motherboard fan control]
+Set the motherboard fan self-starting temperature must be placed after the M8030 I0 command, there are two fans on the makerbot motherboard.
+; There is a side fan that is self-opening when it is higher than a certain test. You can connect the fan to the motherboard fan and configure this parameter.
+M8030 I60 T-1 ; The parameter after I indicates the temperature. When it is 0, it means that the motherboard fan does not change with temperature.
+; otherwise the fan will turn on when the temperature of the extrusion head reaches the specified temperature.
+;
+; [Set the offset of the second extrusion head (right extrusion head)] The unit is mm. If it is a single head, the following two parameters are invalid. The double head offset in cura is set to 0.
+M8031 S35.0; offset in the X direction (left and right)
+M8032 S0 ; Offset in the Y direction (front and rear)
+;
+; [SD card supports folder display]
+M8034 I1 ; 0: Not supported
+; 1: support
+;
+;
+;
+;
+If the machine is a delta structure, the position of the center of the disc is (X0.5 Y0.5),
+; In other structures, the position on the left front is (X0.0 Y0.0)
+In the delta leveling test (only used when enabling the Delta manual leveling test, if it is automatic leveling, the following parameters are invalid), the recommended point position is respectively
+; (X0.5 Y0.5) (X0.15358984, Y0.3) (X0.84641016, Y0.3) (X0.5, Y0.9),
+Of course, you can also take points as absolute coordinates.
+; [leveling test point] can take up to 5 points, X, Y is a floating point number, if X, Y are less than 1, it means the ratio of relative stroke,
+; otherwise expressed as the absolute coordinate value of X, Y, the unit is mm
+If the stroke is (200,200), M8036 X0.1 Y0.1 is the same as M8036 X20 Y20.
+; if the absolute value is less than 1, it means comparison, otherwise it is absolute coordinate
+M8035 I4 ; level the number of points,
+M8036 X0.2 Y0.2 ; In the XYZ manual leveling and delta leveling test, how many points there are, how many instructions there are, if the Delta is automatically leveled, the position of the first point is the sensor from the center of the nozzle Distance (right after right), other point parameters are invalid
+M8036 X0.8 Y0.2
+M8036 X0.8 Y0.8
+M8036 X0.2 Y0.8
+;
+;
+;[machine type]
+M8080 I1 ; 0: XYZ common type,
+; 1:delta type (delta machine limit is connected to X+, Y+, Z+, left: X motor, right: Y motor, rear: Z motor)
+2: Hbot/CoreXY type
+3: SCARA (in the internal test, the limit is connected to X-, Y-)
+4: Excavator structure (internal measurement)
+;
+;[thermal resistance type] temperature sensor type
+For the thermal resistance, the thermal resistance of the same parameter is actually slightly different, and the different thermal resistances are close to each other at low temperatures.
+At high temperatures, the displayed temperature difference can reach 40 degrees. If it is a thermal resistance, be sure to set the correct type of RTD.
+M8081 I2 ; 0: Ideal NTC 100K 1% 3950 B ,
+1: K-type thermocouple,
+2: EPCOS NTC 100K 1% 3950 B, corresponding to marlin's sensor type 1, the vast majority of the market is this
+;
+
+; [Enable automatic leveling] 0: Disable auto leveling enable (automatically change to semi-automatic leveling mode in XYZ structure, youku search "Red Rabbit motherboard - leveling point configuration")
+1: Allow automatic leveling enable, (the automatic leveling point of the XYZ structure is 7x7, which is somewhat similar to the Delta leveling method)
+; xyz leveling documents, please search for xyz auto-leveling at http://www.chitucloud.com/chitudoc/search.html
+M8083 I1; On the delta interface, you can enable it through the interface. If you only want to set it through the interface, you can comment out this line.
+If it is the automatic leveling of the XYZ structure, the leveling switch is directly connected to the Z-, and the original limit switch is removed.
+; use with M8084 Z* instruction at the same time
+;
+; [When leveling, the angle when the servo is retracted, and the angle of the lowering] is only valid when the automatic leveling is supported. For detailed documentation, please search for "steering gear" in the Red Rabbit Help Center.
+M8083 D0 P0 ; D is the angle at which the servo is retracted. P is the angle at which the servo is lowered. If the two angles are the same, it is considered that no servo support is required.
+The angle to which the specific steering gear can be determined by the specific steering gear, 180 rotation angle steering gear, our measured range is between -85-105 degrees
+
+
+; [Delta setting] If it is not a delta type, the following parameters will be ignored; ;;;;;;;;;;;;;;;;;;
+M8083 S440; delta rod length, this can be set directly on the delta interface, if you want to set in the configuration, remove the front semicolon
+M8084 S227; delta ring radius, this can be set directly on the delta interface, when tuning,
+; It is more convenient to set directly on the interface.
+M8084 D-33 ; Leveling radius difference, Auto leveling point radius = Ring radius + Leveling radius difference, print range of some printers
+Larger than the bottom disc, the probe is easily out of print range. In most cases, the difference is negative, such as M8084 D-10
+M8084 P1; Delta automatic leveling mode, different point mode, the point range is a bit different, you can adjust the radius difference
+Correction,
+; 0: 7x7 points, the square takes the point, and the level of the diameter is diagonally diagonal
+; 1:37 points, the regular hexagon takes the point, and the level of the diameter is diagonally diagonal
+;
+;;[Z leveling limit difference, advanced parameters, can not move]
+; Delta machine or auto-leveling XYZ machine height difference of Z leveling limit = Z position of leveling limit - Z zero position,
+In most cases, you only need to set it to 0.
+; 0: Offset is prohibited. The stroke of Z is determined by “set Z to zero”. The printed gcode does not need to add auto-leveling instructions. It is recommended to use this mode.
+; The current position of non-zero:Z is automatically determined when the leveling limit is triggered. Under the DELTA structure, the G29 automatic leveling command must be connected after the G28 is reset to zero.
+; before printing instructions. If the photoelectric leveling limit is usually a positive value, if the extrusion head is attached to the hot plate, it is negative.
+M8084 Z0
+;
+;
+;[Starting LOGO time]
+M8085 I3000; boot logo duration, minimum 100ms, maximum 6000ms
+
+;[Screen saver time]
+M8085 T0; How long does it take to enter the screen saver interface, the unit is seconds (s), when it is 0, it means that the screen saver is disabled.
+
+; [Standby shutdown function, need to cooperate with the shutdown function module]
+M8085 P0; How long does it take to shut down the machine during standby? This function can only be used when the settings for the shutdown function module are installed.
+; The unit is seconds (s), when 0, it means that the standby shutdown function is disabled.
+
+;[Software crossover, this value does not move]
+M8086 I1; software crossover, some users use a 0.9 step angle motor or an external 32 subdivision driver.
+; Want to achieve 1.8 step angle or 16 subdivision effect, you can set the crossover to 2, the default is 1, no division
+;
+;
+;[External Drive Settings]
+M8087 I0 T0 ; I: Settling time of the direction signal valid to the high level of the pulse signal, in ns
+; T: The minimum hold time of the pulse signal, in ns. If there is no external drive control board, set it to zero.
+; Several external drive parameters: THB7128: I100000 T0 ;;;; TB6560: I40000 T0 ;;; TB6600: I100000 T0
+;
+M8488 I100
+;
+;[pwm ratio of motherboard fan self-starting]
+M8489 I256 ; The proportion of pwm of the motherboard fan when starting from the start is up to 256. Some motherboard fans have stronger wind power and louder noise.
+; can change the fan wind and noise through this parameter
+;
+; [manual / consumable interface extruder wire speed]
+M8489 T8 ; In the manual / consumable interface, the wire feeding speed of the consumables is in mm/s.
+The feed speed is too fast, and the wire cannot be fed in time, causing the extruder to squeeze and lose
+;
+;[Delta down leveling speed]
+M8489 S4; When the delta model is leveled, the speed of the point is reduced, and the speed is reduced, which can improve the accuracy of automatic leveling.
+;
+;
+;[Action after printing is completed]
+M8489 P2 ; action after printing is completed
+; 0: Turn off all motors, heat
+; 1: does not move after printing, completely obey the gcode command
+2: After printing is completed, return to zero, the motor is not powered
+; 3: After the printing is completed, it drops to the maximum stroke of Z, and the motor is continuously powered.
+; 4: Wait for the temperature of the nozzle 1 to drop to 50 degrees after the printing is completed to remind the printing to be completed.
+
+; [temperature PID parameter setting] If you are not an expert, and your current temperature control is stable, you do not need to move this parameter
+M301 P15 I0.08 D520 ; Please remove the previous semicolon before configuration
+;
+;
+M8520 I0 ;1: Supports laser engraving related configuration
+; 0: does not support the relevant configuration of laser engraving, the related function is to set the speed in the more button
+;
+;[[【[【[【[Parameter]]]]]]]] This parameter must not be less, otherwise the parameter cannot be saved to the device.
+M8500; save configuration
+;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;[code for testing];;
+;M8510 ; Make the configuration take effect immediately, but do not save the configuration, mainly used in the occasion of temporary test configuration
+;M8511 ;Reverted to a saved configuration, unsaved configuration lost, usually used with M8511
+;M8512 "Configuration file.gcode" ; save configuration to file, file is absolute path
+;M8520 I0 ;1: Support for laser engraving related configuration
+; 0: does not support the relevant configuration of laser engraving, the related function is to set the speed in the more button
+;M8520 T0 ; 1: Support related test functions for manual leveling
+; 0: does not support manual leveling related functions, the function is reflected in the operation of leveling
+;M6010 T0 I4 ; Create loop start point, start Loop0, cycle four times
+;M6011 T0 ; Check if Loop0 is completed, if it is not completed, continue the loop, otherwise continue
+;M6020 X0.1 Y0.92 Z0.5 F6500 ; X, Y, Z and the ratio of the entire print stroke as values
+;M6030 "file" ; run the file in the current relative path, if the file name has ':', it means absolute path
+;M6031 ; Pause printing, but does not move the extrusion head
+;M6032 "file" ; print the file from the sd card and prepare to read the file
+;M6040 I0 ; Restart, the parameters followed are the delay length mm
+;M6045 I4000 "M24" ; Suspend current printing, execute M24 command after 4s delay to resume sd execution command
+;M6046 I4000 "M0"; similar to M6045, but will not suspend the execution of the sd card, do not block the normal execution of the sd card
+;M6050 S0.1 P0.04 ; mixing color configuration extrusion head 1 wire starting ratio of 0.1, Z for each additional 1 mm extrusion head 1 wire ratio increased by 0.04
+;M6051 D0 P0 I1 ; The D0 pin level is pulled into 1, there are 8 extended IO ports, and the motherboard version must have an extended IO port at V3.6 or above.
+On the side of the motherboard, there is a silk screen next to the IO port.
+;M6051 D0 P1 I1 ; Wait for the D0 pin level to become 1, otherwise the command is blocked
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
